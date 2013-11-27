@@ -21,6 +21,8 @@
 
 - (IBAction)showSystemAlert:(id)sender;
 
+- (IBAction)showStackButtonAlert:(id)sender;
+
 - (IBAction)infoButtonAction:(UIButton *)button;
 
 @end
@@ -193,4 +195,40 @@
     
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
 }
+
+- (IBAction)showStackButtonAlert:(id)sender
+{
+    CXAlertView *alertView = [[CXAlertView alloc] initWithTitle:@"A stack of Buttons" message:@"i think the usability is better like this" cancelButtonTitle:@"Dismiss"];
+    
+    [alertView addButtonWithTitle:@"Option 1"
+                             type:CXAlertViewButtonTypeStack
+                          handler:^(CXAlertView *alertView, CXAlertButtonItem *button) {
+                              [alertView dismiss];
+                          }];
+    [alertView addButtonWithTitle:@"Option 2"
+                             type:CXAlertViewButtonTypeStack
+                          handler:^(CXAlertView *alertView, CXAlertButtonItem *button) {
+                              [alertView dismiss];
+                          }];
+    [alertView addButtonWithTitle:@"Option 3"
+                             type:CXAlertViewButtonTypeStack
+                          handler:^(CXAlertView *alertView, CXAlertButtonItem *button) {
+                              [alertView dismiss];
+                          }];
+    [alertView addButtonWithTitle:@"Option 4"
+                             type:CXAlertViewButtonTypeStack
+                          handler:^(CXAlertView *alertView, CXAlertButtonItem *button) {
+                              [alertView dismiss];
+                          }];
+    [alertView addButtonWithTitle:@"Option 5"
+                             type:CXAlertViewButtonTypeStack
+                          handler:^(CXAlertView *alertView, CXAlertButtonItem *button) {
+                              [alertView dismiss];
+                          }];
+    
+
+    
+    [alertView show];
+}
+
 @end

@@ -199,6 +199,9 @@ static CXAlertView *__cx_alert_current_view;
 		case CXAlertViewButtonTypeCustom:
             font = self.customButtonFont;
 			break;
+        case CXAlertViewButtonTypeStack:
+            font = self.customButtonFont;
+			break;
 		case CXAlertViewButtonTypeDefault:
 		default:
 			font = self.buttonFont;
@@ -717,39 +720,101 @@ static CXAlertView *__cx_alert_current_view;
     button.type = type;
     button.defaultRightLineVisible = _showButtonLine;
     [button setTitle:title forState:UIControlStateNormal];
+    
     if ([_buttons count] == 0) {
         button.defaultRightLineVisible = NO;
         button.frame = CGRectMake( self.containerWidth/4, 0, self.containerWidth/2, self.buttonHeight);
     }
-    else {
-        // correct first button
-        CXAlertButtonItem *firstButton = [_buttons objectAtIndex:0];
-        firstButton.defaultRightLineVisible = _showButtonLine;
-        CGRect newFrame = firstButton.frame;
-        newFrame.origin.x = 0;
-        [firstButton setNeedsDisplay];
+    else
+    {
         
-        CGFloat last_x = self.containerWidth/2 * [_buttons count];
-        button.frame = CGRectMake( last_x + self.containerWidth/2, 0, self.containerWidth/2, self.buttonHeight);
-        button.alpha = 0.;
-        if (self.isVisible) {
-            [UIView animateWithDuration:0.3 animations:^{
+        if (type == CXAlertViewButtonTypeStack)
+        {
+            // correct first button
+            CXAlertButtonItem *firstButton = [_buttons objectAtIndex:0];
+            firstButton.defaultRightLineVisible = NO;
+            firstButton.defaultTopLineVisible = YES;
+            CGRect newFrame = firstButton.frame;
+            newFrame.origin.x = 0;
+            newFrame.origin.y = self.buttonHeight * [_buttons count] ;
+            newFrame.size.width =  self.containerWidth;
+            [firstButton setNeedsDisplay];
+            
+            CGFloat last_y = self.buttonHeight * ([_buttons count] - 1);
+            button.alpha = 0.;
+            button.defaultRightLineVisible = NO;
+            button.defaultTopLineVisible = YES;
+            if (self.isVisible) {
+                [UIView animateWithDuration:0.3 animations:^{
+                    firstButton.frame = newFrame;
+                    button.alpha = 1.;
+                    button.frame = CGRectMake( 0, last_y, self.containerWidth, self.buttonHeight);
+                }];
+            }
+            else {
+                firstButton.frame = newFrame;
+                button.alpha = 1.;
+                button.frame = CGRectMake( 0, last_y, self.containerWidth, self.buttonHeight);
+            }
+            
+            
+            
+            
+        }
+        else
+        {
+            
+            // correct first button
+            CXAlertButtonItem *firstButton = [_buttons objectAtIndex:0];
+            firstButton.defaultRightLineVisible = _showButtonLine;
+            CGRect newFrame = firstButton.frame;
+            newFrame.origin.x = 0;
+            [firstButton setNeedsDisplay];
+            
+            CGFloat last_x = self.containerWidth/2 * [_buttons count];
+            button.frame = CGRectMake( last_x + self.containerWidth/2, 0, self.containerWidth/2, self.buttonHeight);
+            button.alpha = 0.;
+            if (self.isVisible) {
+                [UIView animateWithDuration:0.3 animations:^{
+                    firstButton.frame = newFrame;
+                    button.alpha = 1.;
+                    button.frame = CGRectMake( last_x, 0, self.containerWidth/2, self.buttonHeight);
+                }];
+            }
+            else {
                 firstButton.frame = newFrame;
                 button.alpha = 1.;
                 button.frame = CGRectMake( last_x, 0, self.containerWidth/2, self.buttonHeight);
-            }];
-        }
-        else {
-            firstButton.frame = newFrame;
-            button.alpha = 1.;
-            button.frame = CGRectMake( last_x, 0, self.containerWidth/2, self.buttonHeight);
+            }
+            
+            
         }
     }
     
-    [_buttons addObject:button];
-    [_bottomScrollView addSubview:button];
-    CGFloat newContentWidth = self.bottomScrollView.contentSize.width + CGRectGetWidth(button.frame);
-    _bottomScrollView.contentSize = CGSizeMake( newContentWidth, self.buttonHeight);
+    if (type == CXAlertViewButtonTypeStack)
+    {
+        [_buttons addObject:button];
+        [_bottomScrollView addSubview:button];
+        CGFloat newContentHeight = self.bottomScrollView.contentSize.height + CGRectGetHeight(button.frame);
+        NSLog(@"New Height %f",newContentHeight);
+        _bottomScrollView.contentSize = CGSizeMake( self.bottomScrollView.contentSize.width, newContentHeight);
+        
+        [self setBottomScrollViewHeight:newContentHeight];
+    }
+    else
+    {
+        [_buttons addObject:button];
+        [_bottomScrollView addSubview:button];
+        CGFloat newContentWidth = self.bottomScrollView.contentSize.width + CGRectGetWidth(button.frame);
+        _bottomScrollView.contentSize = CGSizeMake( newContentWidth, self.buttonHeight);
+        
+    }
+    
+    
+    
+    
+    
+    
 }
 
 - (CXAlertButtonItem *)buttonItemWithType:(CXAlertViewButtonType)type font:(UIFont *)font
@@ -765,6 +830,10 @@ static CXAlertView *__cx_alert_current_view;
             [button setTitleColor:[self.cancelButtonColor colorWithAlphaComponent:0.8] forState:UIControlStateHighlighted];
 			break;
 		case CXAlertViewButtonTypeCustom:
+            [button setTitleColor:self.customButtonColor forState:UIControlStateNormal];
+            [button setTitleColor:[self.customButtonColor colorWithAlphaComponent:0.8] forState:UIControlStateHighlighted];
+			break;
+        case CXAlertViewButtonTypeStack:
             [button setTitleColor:self.customButtonColor forState:UIControlStateNormal];
             [button setTitleColor:[self.customButtonColor colorWithAlphaComponent:0.8] forState:UIControlStateHighlighted];
 			break;
@@ -812,6 +881,9 @@ static CXAlertView *__cx_alert_current_view;
                 button.titleLabel.font = self.cancelButtonFont;
                 break;
             case CXAlertViewButtonTypeCustom:
+                button.titleLabel.font = self.customButtonFont;
+                break;
+            case CXAlertViewButtonTypeStack:
                 button.titleLabel.font = self.customButtonFont;
                 break;
             case CXAlertViewButtonTypeDefault:

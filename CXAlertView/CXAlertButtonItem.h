@@ -11,7 +11,8 @@
 typedef NS_ENUM(NSInteger, CXAlertViewButtonType) {
     CXAlertViewButtonTypeDefault = 0,
     CXAlertViewButtonTypeCustom = 1,
-    CXAlertViewButtonTypeCancel = 2
+    CXAlertViewButtonTypeCancel = 2,
+    CXAlertViewButtonTypeStack = 3
 };
 
 @class CXAlertView;
@@ -25,5 +26,6 @@ typedef void(^CXAlertButtonHandler)(CXAlertView *alertView, CXAlertButtonItem *b
 @property (nonatomic, assign) CXAlertViewButtonType type;
 @property (nonatomic, copy) CXAlertButtonHandler action;
 @property (nonatomic) BOOL defaultRightLineVisible;
+@property (nonatomic) BOOL defaultTopLineVisible;
 
 @end
